@@ -1,0 +1,6 @@
+bool_false false
+bool_true true
+float 3.14
+null_value null
+number 42
+string hello

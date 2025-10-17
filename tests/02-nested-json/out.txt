@@ -1,0 +1,4 @@
+active true
+user.address.city Osaka
+user.address.zip 530-0001
+user.name Bob

@@ -1,0 +1,9 @@
+{
+  "dollar": "value$VAR",
+  "semicolon": "cmd1;cmd2",
+  "pipe": "cat file | grep test",
+  "ampersand": "cmd1 && cmd2",
+  "redirect": "echo > file",
+  "backtick": "value`command`",
+  "paren": "(subshell)"
+}

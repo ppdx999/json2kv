@@ -1,0 +1,5 @@
+{
+  "html": "<script>alert('xss')</script>",
+  "img": "<img src=x onerror=alert(1)>",
+  "js": "'; DROP TABLE users; --"
+}

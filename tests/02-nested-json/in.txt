@@ -1,0 +1,10 @@
+{
+  "user": {
+    "name": "Bob",
+    "address": {
+      "city": "Osaka",
+      "zip": "530-0001"
+    }
+  },
+  "active": true
+}

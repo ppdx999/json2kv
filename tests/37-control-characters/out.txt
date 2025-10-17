@@ -1,0 +1,4 @@
+backspace 
+bell 
+form_feed 
+vertical_tab 

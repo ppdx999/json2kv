@@ -1,0 +1,1 @@
+{"bell": "\u0007", "backspace": "\u0008", "form_feed": "\u000c", "vertical_tab": "\u000b"}

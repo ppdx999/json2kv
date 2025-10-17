@@ -1,0 +1,4 @@
+absolute /etc/shadow
+mixed ../../../root/.ssh/id_rsa
+unix_path ../../etc/passwd
+windows_path ..\..\windows\system32

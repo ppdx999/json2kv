@@ -1,0 +1,6 @@
+{
+  "unix_path": "../../etc/passwd",
+  "windows_path": "..\\..\\windows\\system32",
+  "mixed": "../../../root/.ssh/id_rsa",
+  "absolute": "/etc/shadow"
+}

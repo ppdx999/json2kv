@@ -1,0 +1,5 @@
+{
+  "bash_subst": "$(rm -rf /)",
+  "backtick_subst": "`rm -rf /`",
+  "multi": "before$(dangerous)after"
+}

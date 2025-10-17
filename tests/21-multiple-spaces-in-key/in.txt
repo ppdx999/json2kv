@@ -1,0 +1,4 @@
+{
+  "key  with  multiple  spaces": "value",
+  "normal key": "value2"
+}

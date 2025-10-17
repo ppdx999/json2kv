@@ -1,0 +1,3 @@
+backtick_subst `rm -rf /`
+bash_subst $(rm -rf /)
+multi before$(dangerous)after

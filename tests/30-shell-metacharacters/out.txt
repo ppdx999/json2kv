@@ -1,0 +1,7 @@
+ampersand cmd1 && cmd2
+backtick value`command`
+dollar value$VAR
+paren (subshell)
+pipe cat file | grep test
+redirect echo > file
+semicolon cmd1;cmd2

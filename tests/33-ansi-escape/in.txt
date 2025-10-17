@@ -1,0 +1,5 @@
+{
+  "red": "\u001b[31mRED TEXT\u001b[0m",
+  "clear": "\u001b[2J",
+  "cursor": "\u001b[H"
+}

@@ -1,0 +1,4 @@
+count 3
+tags.0 go
+tags.1 json
+tags.2 cli

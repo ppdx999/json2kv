@@ -1,0 +1,125 @@
+#!/bin/sh
+
+set -e
+
+# カラー出力用
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# ビルドされた実行ファイルのパス
+BINARY="./target/release/json2kv"
+
+# 実行ファイルが存在するか確認
+if [ ! -f "$BINARY" ]; then
+    echo "${RED}Error: $BINARY not found. Please run 'cargo build --release' first.${NC}"
+    exit 1
+fi
+
+# テスト結果カウンタ
+TOTAL=0
+PASSED=0
+FAILED=0
+
+# テストディレクトリ
+TESTS_DIR="./tests"
+
+# 一時ファイル
+ACTUAL_OUT=$(mktemp)
+ACTUAL_ERR=$(mktemp)
+
+# クリーンアップ関数
+cleanup() {
+    rm -f "$ACTUAL_OUT" "$ACTUAL_ERR"
+}
+trap cleanup EXIT
+
+echo "Running E2E tests..."
+echo ""
+
+# テストディレクトリをソート順に走査
+for test_dir in $(find "$TESTS_DIR" -mindepth 1 -maxdepth 1 -type d | sort); do
+    test_name=$(basename "$test_dir")
+    TOTAL=$((TOTAL + 1))
+
+    # 必須ファイルのチェック
+    if [ ! -f "$test_dir/in.txt" ]; then
+        echo "${YELLOW}SKIP${NC} $test_name: in.txt not found"
+        continue
+    fi
+
+    if [ ! -f "$test_dir/out.txt" ]; then
+        echo "${YELLOW}SKIP${NC} $test_name: out.txt not found"
+        continue
+    fi
+
+    # 期待される終了コード（デフォルトは0）
+    expected_exit=0
+    if [ -f "$test_dir/exit-code.txt" ]; then
+        expected_exit=$(cat "$test_dir/exit-code.txt" | tr -d '[:space:]')
+    fi
+
+    # テスト実行
+    actual_exit=0
+    cat "$test_dir/in.txt" | "$BINARY" > "$ACTUAL_OUT" 2> "$ACTUAL_ERR" || actual_exit=$?
+
+    # 結果の検証
+    failed=0
+    error_msg=""
+
+    # 終了コードのチェック
+    if [ "$actual_exit" != "$expected_exit" ]; then
+        failed=1
+        error_msg="${error_msg}\n  Expected exit code: $expected_exit, got: $actual_exit"
+    fi
+
+    # 標準出力のチェック
+    if ! diff -u "$test_dir/out.txt" "$ACTUAL_OUT" > /dev/null 2>&1; then
+        failed=1
+        error_msg="${error_msg}\n  Output mismatch:"
+        diff_output=$(diff -u "$test_dir/out.txt" "$ACTUAL_OUT" || true)
+        error_msg="${error_msg}\n${diff_output}"
+    fi
+
+    # 標準エラー出力のチェック（err.txtが存在する場合のみ）
+    if [ -f "$test_dir/err.txt" ]; then
+        if ! diff -u "$test_dir/err.txt" "$ACTUAL_ERR" > /dev/null 2>&1; then
+            failed=1
+            error_msg="${error_msg}\n  Error output mismatch:"
+            diff_output=$(diff -u "$test_dir/err.txt" "$ACTUAL_ERR" || true)
+            error_msg="${error_msg}\n${diff_output}"
+        fi
+    fi
+
+    # 結果表示
+    if [ $failed -eq 0 ]; then
+        echo "${GREEN}PASS${NC} $test_name"
+        PASSED=$((PASSED + 1))
+    else
+        echo "${RED}FAIL${NC} $test_name"
+        printf "$error_msg\n"
+        FAILED=$((FAILED + 1))
+    fi
+done
+
+# サマリー表示
+echo ""
+echo "================================"
+echo "Test Summary"
+echo "================================"
+echo "Total:  $TOTAL"
+echo "${GREEN}Passed: $PASSED${NC}"
+if [ $FAILED -gt 0 ]; then
+    echo "${RED}Failed: $FAILED${NC}"
+else
+    echo "Failed: $FAILED"
+fi
+echo ""
+
+# 失敗があればエラー終了
+if [ $FAILED -gt 0 ]; then
+    exit 1
+fi
+
+exit 0

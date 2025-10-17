@@ -1,0 +1,3 @@
+clear [2J
+cursor [H
+red [31mRED TEXT[0m
