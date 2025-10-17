@@ -1,32 +1,33 @@
 # json2kv
 
-標準入力からJSONを受け取り、KeyValue形式のファイルに変換するRustプログラムです。
+A Rust program that converts JSON data from stdin to KeyValue format.
 
-## 概要
+## Overview
 
-このツールは、JSON形式のデータを読み取り、フラットなKeyValue形式に変換します。ネストされたJSON構造は、キーをドット(`.`)で連結して表現します。
+This tool reads JSON data and converts it to a flat KeyValue format. Nested JSON structures are represented by concatenating keys with dots (`.`).
 
-## KeyValue形式の仕様
+## KeyValue Format Specification
 
-- 1つのJSON key-valueペアを1行に格納
-- keyとvalueは空白（スペース）で区切る
-- keyとvalueの識別は最初に登場する空白で区切る
-- keyに空白が含まれる場合は`-`（ハイフン）に変換
-- valueは空白をそのまま含むことができる
-- keyにもvalueにも改行を含めない
-  - keyに改行（`\n`、`\r`、`\r\n`）が含まれる場合はエラー終了
-  - valueに改行が含まれる場合は以下のように処理：
-    - `\r\n`（Windows形式）は事前に`\n`に正規化
-    - `\r`（古いMac形式）も事前に`\n`に正規化
-    - 正規化された`\n`を`\n`にエスケープ
-- ヌル文字など危険な文字が含まれる場合はエラー終了
-- ネストされたJSON構造は、キーを`.`で連結
+- Each JSON key-value pair is stored on a single line
+- Keys and values are separated by a space
+- Keys and values are identified by the first space that appears
+- Spaces in keys are converted to `-` (hyphen)
+- Tabs in keys are converted to `-` (hyphen)
+- Values can contain spaces as-is
+- Neither keys nor values should contain newlines
+  - If a key contains newlines (`\n`, `\r`, `\r\n`), the program exits with an error
+  - If a value contains newlines, they are processed as follows:
+    - `\r\n` (Windows format) is normalized to `\n`
+    - `\r` (old Mac format) is normalized to `\n`
+    - Normalized `\n` is escaped to `\n`
+- The program exits with an error if dangerous characters such as null characters are present
+- Nested JSON structures are represented by concatenating keys with `.`
 
-## インストール
+## Installation
 
-### バイナリをダウンロード（推奨）
+### Download Binary (Recommended)
 
-最新のリリースから各プラットフォーム向けのバイナリをダウンロードできます：
+You can download binaries for each platform from the latest release:
 
 ```bash
 # Linux (x86_64)
@@ -53,33 +54,33 @@ sudo mv json2kv-macos-aarch64 /usr/local/bin/json2kv
 # Invoke-WebRequest -Uri "https://github.com/ppdx999/json2kv/releases/latest/download/json2kv-windows-x86_64.exe" -OutFile "json2kv.exe"
 ```
 
-### ソースからビルド
+### Build from Source
 
 ```bash
-# ビルド
+# Build
 cargo build --release
 
-# バイナリは target/release/json2kv に生成されます
+# Binary is generated at target/release/json2kv
 ```
 
-## 使用方法
+## Usage
 
 ```bash
-# 標準入力からJSONを受け取る
+# Read JSON from stdin
 echo '{"name": "Alice", "age": 30}' | json2kv
 
-# ファイルから読み込む
+# Read from file
 cat input.json | json2kv
 
-# 出力ファイルを指定
+# Specify output file
 cat input.json | json2kv > output.kv
 ```
 
-## 入出力例
+## Input/Output Examples
 
-### 例1: シンプルなJSON
+### Example 1: Simple JSON
 
-**入力:**
+**Input:**
 ```json
 {
   "name": "Alice",
@@ -88,16 +89,16 @@ cat input.json | json2kv > output.kv
 }
 ```
 
-**出力:**
+**Output:**
 ```
 age 30
 city Tokyo
 name Alice
 ```
 
-### 例2: ネストされたJSON
+### Example 2: Nested JSON
 
-**入力:**
+**Input:**
 ```json
 {
   "user": {
@@ -111,7 +112,7 @@ name Alice
 }
 ```
 
-**出力:**
+**Output:**
 ```
 active true
 user.address.city Osaka
@@ -119,9 +120,9 @@ user.address.zip 530-0001
 user.name Bob
 ```
 
-### 例3: keyに空白が含まれる場合
+### Example 3: Keys with Spaces
 
-**入力:**
+**Input:**
 ```json
 {
   "user name": "Charlie",
@@ -129,31 +130,31 @@ user.name Bob
 }
 ```
 
-**出力:**
+**Output:**
 ```
 email-address charlie@example.com
 user-name Charlie
 ```
 
-### 例4: valueに改行が含まれる場合
+### Example 4: Values with Newlines
 
-**入力:**
+**Input:**
 ```json
 {
   "description": "This is\na multi-line\ntext"
 }
 ```
 
-**出力:**
+**Output:**
 ```
 description This is\na multi-line\ntext
 ```
 
-**注意:** 改行形式（`\r\n`、`\r`、`\n`）に関わらず、すべて`\n`に正規化されてからエスケープされます。これにより、Windows、Mac、Linuxなど異なるプラットフォームの改行形式を統一的に扱えます。
+**Note:** Regardless of newline format (`\r\n`, `\r`, `\n`), all are normalized to `\n` before being escaped. This allows uniform handling of newline formats from different platforms (Windows, Mac, Linux).
 
-### 例5: 配列を含むJSON
+### Example 5: JSON with Arrays
 
-**入力:**
+**Input:**
 ```json
 {
   "tags": ["go", "json", "cli"],
@@ -161,7 +162,7 @@ description This is\na multi-line\ntext
 }
 ```
 
-**出力:**
+**Output:**
 ```
 count 3
 tags.0 go
@@ -169,17 +170,17 @@ tags.1 json
 tags.2 cli
 ```
 
-## エラー処理
+## Error Handling
 
-以下の場合はエラー終了します：
+The program exits with an error in the following cases:
 
-- 不正なJSON形式
-- keyに改行（`\n`、`\r`、`\r\n`）が含まれる場合
-- ヌル文字（`\0`）が含まれる場合
-- その他の制御文字が不適切に含まれる場合
+- Invalid JSON format
+- Keys contain newlines (`\n`, `\r`, `\r\n`)
+- Null characters (`\0`) are present
+- Other control characters are inappropriately included
 
-**注意:** valueに改行が含まれる場合はエラーにならず、自動的にエスケープされます。
+**Note:** Values containing newlines do not cause an error and are automatically escaped.
 
-## ライセンス
+## License
 
 MIT License

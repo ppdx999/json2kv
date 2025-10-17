@@ -4,14 +4,14 @@ use std::io::{self, Read};
 use std::process;
 
 fn main() {
-    // 標準入力からJSONを読み取る
+    // Read JSON from stdin
     let mut input = String::new();
     if let Err(e) = io::stdin().read_to_string(&mut input) {
         eprintln!("Error reading input: {}", e);
         process::exit(1);
     }
 
-    // JSONをパース
+    // Parse JSON
     let json: Value = match serde_json::from_str(&input) {
         Ok(v) => v,
         Err(e) => {
@@ -20,14 +20,14 @@ fn main() {
         }
     };
 
-    // JSONをKeyValue形式に変換
+    // Convert JSON to KeyValue format
     let mut kv_map = BTreeMap::new();
     if let Err(e) = flatten_json(&json, String::new(), &mut kv_map) {
         eprintln!("Error: {}", e);
         process::exit(1);
     }
 
-    // ソートされた順序で出力（BTreeMapは自動的にソートされる）
+    // Output in sorted order (BTreeMap automatically sorts)
     for (key, value) in kv_map {
         println!("{} {}", key, value);
     }
@@ -81,27 +81,27 @@ fn flatten_json(
 }
 
 fn sanitize_key(key: &str) -> Result<String, String> {
-    // keyに改行が含まれているかチェック
+    // Check if key contains newline characters
     if key.contains('\n') || key.contains('\r') {
         return Err(format!("Key contains newline character: {}", key));
     }
 
-    // ヌル文字のチェック
+    // Check for null character
     if key.contains('\0') {
         return Err("Key contains null character".to_string());
     }
 
-    // 空白とタブをハイフンに変換
+    // Convert spaces and tabs to hyphens
     Ok(key.replace(' ', "-").replace('\t', "-"))
 }
 
 fn sanitize_value(value: &str) -> Result<String, String> {
-    // ヌル文字のチェック
+    // Check for null character
     if value.contains('\0') {
         return Err("Value contains null character".to_string());
     }
 
-    // 改行を正規化してエスケープ
+    // Normalize and escape newlines
     // \r\n → \n → \\n
     // \r → \n → \\n
     // \n → \\n
