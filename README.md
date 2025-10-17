@@ -24,6 +24,37 @@
 
 ## インストール
 
+### バイナリをダウンロード（推奨）
+
+最新のリリースから各プラットフォーム向けのバイナリをダウンロードできます：
+
+```bash
+# Linux (x86_64)
+curl -LO https://github.com/ppdx999/json2kv/releases/latest/download/json2kv-linux-x86_64
+chmod +x json2kv-linux-x86_64
+sudo mv json2kv-linux-x86_64 /usr/local/bin/json2kv
+
+# Linux (ARM64)
+curl -LO https://github.com/ppdx999/json2kv/releases/latest/download/json2kv-linux-aarch64
+chmod +x json2kv-linux-aarch64
+sudo mv json2kv-linux-aarch64 /usr/local/bin/json2kv
+
+# macOS (Intel)
+curl -LO https://github.com/ppdx999/json2kv/releases/latest/download/json2kv-macos-x86_64
+chmod +x json2kv-macos-x86_64
+sudo mv json2kv-macos-x86_64 /usr/local/bin/json2kv
+
+# macOS (Apple Silicon)
+curl -LO https://github.com/ppdx999/json2kv/releases/latest/download/json2kv-macos-aarch64
+chmod +x json2kv-macos-aarch64
+sudo mv json2kv-macos-aarch64 /usr/local/bin/json2kv
+
+# Windows (PowerShell)
+# Invoke-WebRequest -Uri "https://github.com/ppdx999/json2kv/releases/latest/download/json2kv-windows-x86_64.exe" -OutFile "json2kv.exe"
+```
+
+### ソースからビルド
+
 ```bash
 # ビルド
 cargo build --release
@@ -35,13 +66,13 @@ cargo build --release
 
 ```bash
 # 標準入力からJSONを受け取る
-echo '{"name": "Alice", "age": 30}' | ./target/release/json2kv
+echo '{"name": "Alice", "age": 30}' | json2kv
 
 # ファイルから読み込む
-cat input.json | ./target/release/json2kv
+cat input.json | json2kv
 
 # 出力ファイルを指定
-cat input.json | ./target/release/json2kv > output.kv
+cat input.json | json2kv > output.kv
 ```
 
 ## 入出力例
