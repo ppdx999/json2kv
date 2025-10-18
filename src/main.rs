@@ -1,9 +1,17 @@
 use serde_json::Value;
 use std::collections::BTreeMap;
+use std::env;
 use std::io::{self, Read};
 use std::process;
 
 fn main() {
+    // Check for help flag
+    let args: Vec<String> = env::args().collect();
+    if args.len() > 1 && (args[1] == "-h" || args[1] == "--help") {
+        print_help();
+        process::exit(0);
+    }
+
     // Read JSON from stdin
     let mut input = String::new();
     if let Err(e) = io::stdin().read_to_string(&mut input) {
@@ -109,4 +117,25 @@ fn sanitize_value(value: &str) -> Result<String, String> {
     let escaped = normalized.replace('\n', "\\n");
 
     Ok(escaped)
+}
+
+fn print_help() {
+    println!("json2kv - Convert JSON data to KeyValue format");
+    println!();
+    println!("USAGE:");
+    println!("    json2kv [OPTIONS]");
+    println!();
+    println!("    Reads JSON from stdin and converts it to KeyValue format.");
+    println!("    Nested structures are flattened with dot notation.");
+    println!();
+    println!("OPTIONS:");
+    println!("    -h, --help    Print this help message");
+    println!();
+    println!("EXAMPLES:");
+    println!("    echo '{{\"name\": \"Alice\", \"age\": 30}}' | json2kv");
+    println!("    cat input.json | json2kv");
+    println!("    cat input.json | json2kv > output.kv");
+    println!();
+    println!("For more information, see:");
+    println!("    https://github.com/ppdx999/json2kv/blob/main/README.md");
 }
